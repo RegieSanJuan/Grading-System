@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sir al Grade Calculator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      .calculator {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #results {
+        margin-top: 20px;
+        background-color: #f1f1f1;
+        padding: 15px;
+        border-radius: 5px;
+      }
+      .error {
+        color: red;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calculator">
+      <h2>Sir al Grade Calculator</h2>
+      <div>
+        <label>Quiz 1 Score:</label>
+        <input type="number" id="quiz1Score" placeholder="Score" />
+        <input type="number" id="quiz1Items" placeholder="Total Items" />
+      </div>
+      <div>
+        <label>Quiz 2 Score:</label>
+        <input type="number" id="quiz2Score" placeholder="Score" />
+        <input type="number" id="quiz2Items" placeholder="Total Items" />
+      </div>
+      <div>
+        <label>Lab Scores (3 labs):</label>
+        <input type="number" id="lab1" placeholder="Lab 1 Score" />
+        <input type="number" id="lab2" placeholder="Lab 2 Score" />
+        <input type="number" id="lab3" placeholder="Lab 3 Score" />
+      </div>
+      <div>
+        <label>Midterm or FInal Exam:</label>
+        <input type="number" id="mtScore" placeholder="Score" />
+        <input type="number" id="mtItems" placeholder="Total Items" />
+      </div>
+      <button onclick="calculateMidtermGrade()">Calculate Grade</button>
+      <div id="results"></div>
+      <div id="error" class="error"></div>
+    </div>
+
+    <script>
+      function validateScore(score, items) {
+        if (score > items) {
+          throw new Error("Score cannot be greater than the number of items.");
+        }
+        return score;
+      }
+
+      function tg(score, items) {
+        return (score / items) * 100;
+      }
+
+      function eq(transmutedGrade) {
+        if (transmutedGrade >= 96) return 4.0;
+        if (transmutedGrade >= 94) return 3.8;
+        if (transmutedGrade >= 90) return 3.6;
+        if (transmutedGrade >= 87) return 3.4;
+        if (transmutedGrade >= 83) return 3.2;
+        if (transmutedGrade >= 80) return 3.0;
+        if (transmutedGrade >= 77) return 2.8;
+        if (transmutedGrade >= 73) return 2.6;
+        if (transmutedGrade >= 70) return 2.4;
+        if (transmutedGrade >= 67) return 2.2;
+        if (transmutedGrade >= 63) return 2.0;
+        if (transmutedGrade >= 60) return 1.8;
+        if (transmutedGrade >= 57) return 1.6;
+        if (transmutedGrade >= 53) return 1.4;
+        if (transmutedGrade >= 50) return 1.2;
+        return 1.0;
+      }
+
+      function calculateMidtermGrade() {
+        const resultsDiv = document.getElementById("results");
+        const errorDiv = document.getElementById("error");
+        resultsDiv.innerHTML = "";
+        errorDiv.innerHTML = "";
+
+        try {
+          // Quiz 1
+          const quiz1Score = parseFloat(
+            document.getElementById("quiz1Score").value
+          );
+          const quiz1Items = parseInt(
+            document.getElementById("quiz1Items").value
+          );
+          validateScore(quiz1Score, quiz1Items);
+
+          // Quiz 2
+          const quiz2Score = parseFloat(
+            document.getElementById("quiz2Score").value
+          );
+          const quiz2Items = parseInt(
+            document.getElementById("quiz2Items").value
+          );
+          validateScore(quiz2Score, quiz2Items);
+
+          // Labs
+          const lab1 = parseFloat(document.getElementById("lab1").value);
+          const lab2 = parseFloat(document.getElementById("lab2").value);
+          const lab3 = parseFloat(document.getElementById("lab3").value);
+
+          // Midterm
+          const mtScore = parseFloat(document.getElementById("mtScore").value);
+          const mtItems = parseInt(document.getElementById("mtItems").value);
+          validateScore(mtScore, mtItems);
+
+          // Validate input ranges
+          if (
+            quiz1Score < 0 ||
+            quiz1Score > quiz1Items ||
+            quiz2Score < 0 ||
+            quiz2Score > quiz2Items ||
+            mtScore < 0 ||
+            mtScore > mtItems
+          ) {
+            throw new Error("Input scores must be within the range of items.");
+          }
+
+          // Calculate transmuted grades
+          const quiz1Tg = tg(quiz1Score, quiz1Items);
+          const quiz2Tg = tg(quiz2Score, quiz2Items);
+
+          // Calculate equivalent grades
+          const quiz1Eq = eq(quiz1Tg);
+          const quiz2Eq = eq(quiz2Tg);
+
+          // Calculate average equivalent grade for quizzes
+          const quizAvgEq = (quiz1Eq + quiz2Eq) / 2;
+
+          // Calculate average score for labs
+          const labAvgScore = (lab1 + lab2 + lab3) / 3;
+          const labAvgEq = eq(labAvgScore);
+
+          // Calculate equivalent grade for midterm exam
+          const mtEq = eq(tg(mtScore, mtItems));
+
+          // Calculate midterm grade
+          const midtermGrade = quizAvgEq * 0.35 + labAvgEq * 0.35 + mtEq * 0.3;
+
+          // Display results
+          resultsDiv.innerHTML = `
+                    <h3>Calculation Results:</h3>
+                    <p>Quiz 1 TG: ${quiz1Tg.toFixed(2)}</p>
+                    <p>Quiz 1 Eq: ${quiz1Eq.toFixed(2)}</p>
+                    <p>Quiz 2 TG: ${quiz2Tg.toFixed(2)}</p>
+                    <p>Quiz 2 Eq: ${quiz2Eq.toFixed(2)}</p>
+                    <p>Quiz Average: ${quizAvgEq.toFixed(2)}</p>
+                    <p>Lab Average: ${labAvgEq.toFixed(2)}</p>
+                    <p>Midterm or FInal Exam: ${mtEq.toFixed(2)}</p>
+                    <p><strong>Midterm or final Grade: ${midtermGrade.toFixed(
+                      2
+                    )}</strong></p>
+                `;
+        } catch (error) {
+          errorDiv.textContent = `Error: ${error.message}`;
+        }
+      }
+    </script>
+  </body>
+</html>
